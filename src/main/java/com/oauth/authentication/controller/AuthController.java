@@ -2,6 +2,7 @@ package com.oauth.authentication.controller;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,9 +47,17 @@ public class AuthController {
             @RequestParam String password, 
             HttpServletResponse response) {
 
+
+        Collection<String> headers = response.getHeaderNames();
+        if(!headers.isEmpty()){
+            for(String s: headers){
+                String header = response.getHeader(s);
+                System.out.println(header);
+            }
+        }
     	RestTemplate restTemplate = new RestTemplate();
     	
-    	String otherServiceUrl = "http://localhost:8090/user";
+    	String otherServiceUrl = "http://localhost:8090";
 
         // Prepare request parameters
         Map<String, String> params = new HashMap<>();
@@ -62,6 +71,7 @@ public class AuthController {
                 .queryParam("username", username)
                 .queryParam("password", password);
         
+        System.out.println(builder.toUriString());
 
         ResponseEntity<String> otherServiceResponse = restTemplate.getForEntity(builder.toUriString(), String.class);
 
@@ -75,10 +85,9 @@ public class AuthController {
               sessionCookie.setPath("/"); // Accessible to all paths
               sessionCookie.setMaxAge(24 * 60 * 60);  // Set cookie expiration to 24 hours
               response.addCookie(sessionCookie);
-
             //   Step 5: Redirect to main page or user page in main service
               try {
-            	    String redirectUrl = "http://localhost:8090"; // Adjust this URL
+            	    String redirectUrl = "http://shopping:8090"; // Adjust this URL
             	    response.sendRedirect(redirectUrl);
             	} catch (IOException e) {
             	    e.printStackTrace();
